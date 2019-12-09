@@ -9,7 +9,9 @@
   ([vector expr]
    ;; gör kontroll av längd på vector
    (try
-     (let [var (first vector)
-           value (first (rest vector))
-           var value]
-       expr))))
+     ~(let [var (first vector)
+            value (first (rest vector))
+            var value]
+        expr)
+     (catch Exception e (.getMessage e))
+     (finally (.close (^Closeable var))))))
