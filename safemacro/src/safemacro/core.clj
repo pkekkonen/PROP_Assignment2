@@ -4,19 +4,22 @@
 (defmacro safe 
   ([expr]
    `(try 
-     ~expr
+     (eval ~expr)
      (catch Exception e# (.getMessage e#))))
   ([vector expr]
    ;; gör kontroll av längd på vector
    `(try
-     ~(let [^Closeable var (first vector)
-            value (first (rest vector))
+     (let [^Closeable var ~(first vector)
+            value ~(first (rest vector))
             var value]
-        expr
-        (. var close))
-      (catch Exception e# (.getMessage e#)))))
+        (eval ~expr)
+        (. var close)
+      (catch Exception e# (.getMessage e#))))))
 
 
 (safe '([a 0] (/ 1 a)))
+
+(safe [s (FileReader. (File. "file.txt"))] (.read s))
+
 (safe '(/ 1 0))
 (safe '(+ 1 2))
