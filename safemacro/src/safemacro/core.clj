@@ -1,5 +1,13 @@
 (ns safemacro.core
   (:gen-class))
 
-(defn -main []
-  (println "Hello, World!"))
+(defmacro safe 
+  [vector expr]
+  (is (thrown? Exception (expr))))
+  
+  
+  
+  
+  
+  
+  
