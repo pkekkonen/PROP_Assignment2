@@ -8,10 +8,13 @@
      (catch Exception e (.getMessage e))))
   ([vector expr]
    ;; gör kontroll av längd på vector
-   (try
-     ~(let [var (first vector)
+   `(try
+     ~(let [^Closeable var (first vector)
             value (first (rest vector))
             var value]
-        expr)
-     (catch Exception e (.getMessage e))
-     (finally (.close (^Closeable var))))))
+        expr
+        (. var close))
+     (catch Exception e (.getMessage e)))))
+
+
+
