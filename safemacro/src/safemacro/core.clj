@@ -11,6 +11,7 @@
   ([vector expr]
    ;; gör kontroll av längd på vector
    `(try
+     <<<<<<< HEAD
      (let [var# (first ~vector)
            value# (first (rest ~vector))
            var# value#] 
