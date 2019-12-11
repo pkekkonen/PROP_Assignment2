@@ -12,13 +12,19 @@
   ([[^Closeable var value] expr]
    `(try
      (let [~var ~value]
-      (eval ~expr)
-      (if (instance? Closeable ~var)
-          (. ~var close)))
-     (catch Exception e# (.getMessage e#)))))
+      (eval ~expr))
+     (catch Exception e# (.getMessage e#))
+     (finally 
+      (let [~var ~value]
+       (if (instance? Closeable ~var)
+        (. ~var close)))))))
 
 (macroexpand '(safe [a 0] a))
 (safe [a 0] (/ 1 a))
 (safe [a 2] (+ a 22))
+(macroexpand '(safe [a 2] (+ a 22)))
 
-(safe [s (FileReader. (File. "hejhej.txt"))] (.read s))
+(def v (safe [s (FileReader. (File. "hejhej.txt"))] (.read s)))
+(macroexpand '(safe [s (FileReader. (File. "hejhej.txt"))] (.read s)))
+
+(do v)
