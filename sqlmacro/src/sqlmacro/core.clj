@@ -22,6 +22,8 @@
 (getColumns entries)
 
 (defn filterCond [table condOp condColumn condValue]
-  )
+  (filter #(condOp (condColumn %) condValue) table))
+
+(filterCond (getColumns entries) = :s2 true)
 
 ;; (filter (function) listan)
