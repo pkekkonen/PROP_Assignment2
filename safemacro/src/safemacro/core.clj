@@ -9,12 +9,12 @@
   ([vector expr]
    ;; gör kontroll av längd på vector
    `(try
-     (let [^Closeable var ~(first vector)
-            value ~(first (rest vector))
+     (let [^Closeable var (first ~vector)
+            value (first (rest ~vector))
             var value]
-        (eval ~expr)
+        (eval ~expr))
         (. var close)
-      (catch Exception e# (.getMessage e#))))))
+      (catch Exception e# (.getMessage e#)))))
 
 
 (safe '([a 0] (/ 1 a)))
