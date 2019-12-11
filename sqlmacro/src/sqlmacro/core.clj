@@ -1,5 +1,5 @@
-(ns sqlmacro.core
-  (:gen-class))
 
-(defn -main []
-  (println "Hello, World!"))
+(defmacro select [columns _ table _ cond _ orderarg])
+  
+
+;; (filter (function) listan)
