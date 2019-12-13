@@ -6,14 +6,39 @@
 
 (select [:id :name] from persons where [:id > 2] orderby :name) 
 
-(select [:s2 :s1] from entries where [:month > 4] orderby :val) 
+(select [:s2 :s1] from entries where [:month > 4] orderby :val)
 
 
 (defmacro select [[& wantedColumns] _ table _ [condColumn condOp condValue] _ orderArg]
+  `(defn getColumns 
+    ([table wantedColumns]
+     (if (empty? (rest table))
+      (conj nil (select-keys (first table) wantedColumns))
+      (getColumns table nil wantedColumns)))
+    ([table result wantedColumns]
+     (if (empty? (rest table))
+      (conj result (select-keys (first table) wantedColumns))
+      (getColumns (rest table) (conj result (select-keys (first table) wantedColumns)) wantedColumns))))
+  `(defn filterCond [table condOp condColumn condValue]
+    (filter #(condOp (condColumn %) condValue) table))
+  `(defn orderTable [table orderArg]
+    (sort-by orderArg table))
   `(orderTable
     (filterCond
-      ((getColumns ~table ~wantedColumns)  ~condOp ~condColumn ~condValue))
-    ~orderArg))
+     ((getColumns ~table ~wantedColumns)  ~condOp ~condColumn ~condValue)
+     ~orderArg)))
+
+
+
+(defn select2 [[& wantedColumns] _ table _ [condColumn condOp condValue] _ orderArg]
+   (orderTable
+    (filterCond
+     ((getColumns table wantedColumns)  condOp condColumn condValue)
+     orderArg)))
+
+(select2 [:id :name] from persons where [:id > 2] orderby :name) 
+
+(select2 [:s2] from entries where [:month > 4] orderby :val) 
 
 (def entries [{:month 1 :val 12 :s1 true :s2 false}
               {:month 2 :val 3 :s1 false :s2 true}
@@ -31,8 +56,8 @@
 (defn getColumns 
   ([table wantedColumns]
    (if (empty? (rest table))
-     (conj nil (select-keys (first table) wantedColumns))
-     (getColumns table nil wantedColumns)))
+    (conj nil (select-keys (first table) wantedColumns))
+    (getColumns table nil wantedColumns)))
   ([table result wantedColumns]
    (if (empty? (rest table))
      (conj result (select-keys (first table) wantedColumns))
@@ -52,6 +77,6 @@
 (defn orderTable [table orderArg]
   (sort-by orderArg table))
 
-(orderTable (filterCond (getColumns entries '(:val :s2)) = :s2 true) :val)
+(orderTable (filterCond (getColumns entries :val :s2)) = :s2 true) :val
 
 ;; (filter (function) listan)
