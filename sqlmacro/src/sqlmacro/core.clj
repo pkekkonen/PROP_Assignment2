@@ -15,23 +15,30 @@
 
 (def entries2 '({:month 1 :val 12 :s1 true :s2 false}))
 
-(def persons '({:id 1 :name "olle"} {:id 2 :name "anna"} {:id 3 :name "isak"} {:id 4 :name "beatrice"}))
+(def persons '({:id 1 :name "olle"} 
+               {:id 2 :name "anna"} 
+               {:id 3 :name "isak"} 
+               {:id 4 :name "beatrice"}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
-(defn filterCond [table condOp condColumn condValue]
-  (filter #(condOp (condColumn %) condValue) table))
-
-(defn getColumns [wantedColumns table returnValue] 
-  (if (empty? (rest table))
-    ;; seq nedan för att konvertera returvärdet från vektor [] till lista ()
-    (seq (conj returnValue (select-keys (first table) wantedColumns)))
-    (getColumns wantedColumns (rest table) (conj returnValue (select-keys (first table) wantedColumns)))))
-;; recur?
 
 (defmacro select [[& wantedColumns] _ table _ [condColumn condOp condValue] _ orderArg]
+  
+  (defn filterCond [table condOp condColumn condValue]
+    (filter #(condOp (condColumn %) condValue) table))
+
+  (defn getColumns [wantedColumns table returnValue] 
+    (if (empty? (rest table))
+    ;; seq nedan för att konvertera returvärdet från vektor [] till lista ()
+      (seq (conj returnValue (select-keys (first table) wantedColumns)))
+      (getColumns wantedColumns (rest table) (conj returnValue (select-keys (first table) wantedColumns)))))
+;; recur?
+  (defn orderTable [table orderArg]
+    (sort-by orderArg table))
+  
   `(getColumns [~@wantedColumns]
   ;; wantedColumns sparas i en lista (pga &) men när den används i select-keys funktionen
   ;; i getColumns så måste de ligga i en vektor. Därav tar vi bort paranteserna och lägger
@@ -65,8 +72,7 @@
 
 
 ;; så pass simpel att enklare att sortera direkt i macrot?
-(defn orderTable [table orderArg]
-  (sort-by orderArg table))
+
 
 
 
