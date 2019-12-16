@@ -13,11 +13,11 @@
    `(try
      (let [~var ~value]
       (eval ~expr))
-     (catch Exception e# (.getMessage e#))
+     (catch Exception e#  (.getMessage e#)) ;;ska returnera e
      (finally 
       (let [~var ~value]
        (if (instance? Closeable ~var)
-        (. ~var close)))))))
+           (. ~var close)))))))
 
 (macroexpand '(safe [a 0] a))
 (safe [a 0] (/ 1 a))
