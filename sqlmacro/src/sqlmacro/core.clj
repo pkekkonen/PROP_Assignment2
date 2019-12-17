@@ -21,15 +21,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-
-
 (defmacro select [[& wantedColumns] _ table _ [condColumn condOp condValue] _ orderArg]
-  
-  `(defn getColumns [wantedColumns table returnValue] 
+  (defn getColumns [wantedColumns table returnValue] 
     (if (empty? (rest table))
-     (seq (conj returnValue (select-keys (first table) wantedColumns)))
-     (recur wantedColumns (rest table) (conj returnValue (select-keys (first table) wantedColumns)))))
-  
+      (seq (conj returnValue (select-keys (first table) wantedColumns)))
+      (recur wantedColumns (rest table) (conj returnValue (select-keys (first table) wantedColumns)))))
+
   `(getColumns [~@wantedColumns]
     (filter #(~condOp (~condColumn %) ~condValue) (sort-by ~orderArg ~table)) []))
 
@@ -44,5 +41,23 @@
 
 
 
+
+(defn getColumns2 [wantedColumns table returnValue] 
+    (if (empty? (rest table))
+      (seq (conj returnValue (select-keys (first table) wantedColumns)))
+      (recur wantedColumns (rest table) (conj returnValue (select-keys (first table) wantedColumns)))))
+
+
+
+
+(defn select2 [[& wantedColumns] table condColumn condOp condValue orderArg]
+  (getColumns2 wantedColumns
+    (filter #(condOp (condColumn %) condValue) (sort-by orderArg table)) '[]))
+
+(select2 [:id :name] persons :id < 9 :id) 
+
+(select2 [:month] entries :s1 = true :val)
+
+(getColumns2 '[:month]  entries '[])
 
 
